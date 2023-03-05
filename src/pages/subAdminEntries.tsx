@@ -12,7 +12,7 @@ import { format,parse } from 'date-fns'
 import JSZip from 'jszip';
 import Cookies from 'js-cookie';
 
-
+import * as XLSX from 'xlsx';
 
 import {ref as sRef,getDownloadURL} from 'firebase/storage'
 import { Modal, Button, Form } from 'react-bootstrap';
@@ -163,7 +163,8 @@ const handleImages=async()=>{
 
 }
 function exportToExcel(tableData:any, filename:any) {
-  const XLSX=require('xlsx')
+  
+
 
   const worksheet = XLSX.utils.json_to_sheet(tableData);
   const workbook = XLSX.utils.book_new();
