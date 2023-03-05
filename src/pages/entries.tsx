@@ -9,8 +9,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { format,parse } from 'date-fns'
-import JSZip from 'jszip';
-import Cookies from 'js-cookie';
+
 
 import * as XLSX from 'xlsx';
 
@@ -43,7 +42,7 @@ type Props = {
 
 export default function LayoutAuthenticated({ children }: Props) {
   const dispatch = useAppDispatch()
-  const zip = new JSZip();
+  
 
   const [entries,setEntries]:any=useState({})
   const [searchedEntries,setSearchedEntries]:any=useState({})
@@ -199,7 +198,7 @@ Object.entries(entries).map(([key,value]:any)=>{
 
 const generatePDF = () => {
  
-  const data:any=[]
+  let data:any=[]
   Object.entries(entries).map(([key,value]:any)=>{
     data.push([
       value.date,
