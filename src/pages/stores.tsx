@@ -55,7 +55,7 @@ const [filters,setFilterData]:any=useState({
   westCode:""
 
 })
-let isAlready=0
+var isAlready=0
 
 const handleClose = () => setShow(false);
 const handleShow = () => setShow(true);
@@ -160,9 +160,9 @@ getStores()
     
     return   cityMatch && chainMatch && categoryMatch;
   });
-  let arr:any={}
+  var arr:any={}
   filteredData.map((item:any)=>{
-  let obj={[item[0]]:item[1]}
+  var obj={[item[0]]:item[1]}
   
   arr={...arr,...obj}
   

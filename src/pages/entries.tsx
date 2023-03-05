@@ -13,6 +13,7 @@ import JSZip from 'jszip';
 import Cookies from 'js-cookie';
 
 
+import XLSX from 'xlsx'
 import {ref as sRef,getDownloadURL} from 'firebase/storage'
 import { Modal, Button, Form } from 'react-bootstrap';
 import {toast,Toaster} from 'react-hot-toast'
@@ -162,16 +163,16 @@ const handleImages=async()=>{
 
 }
 function exportToExcel(tableData:any, filename:any) {
-  const XLSX = require('xlsx');
+  
   const worksheet = XLSX.utils.json_to_sheet(tableData);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
   writeFile(workbook, filename);
 }
 const handleXLSX=async()=>{
-  let data:any=[]
+  var data:any=[]
 Object.entries(entries).map(([key,value]:any)=>{
-  let obj={
+  var obj={
    date:value.date,
     user:value.username,
     westCode: value.store.westCode,
@@ -196,7 +197,7 @@ Object.entries(entries).map(([key,value]:any)=>{
 
 const generatePDF = () => {
  
-  let data:any=[]
+  var data:any=[]
   Object.entries(entries).map(([key,value]:any)=>{
     data.push([
       value.date,
@@ -294,7 +295,7 @@ const generatePDF = () => {
 };
  
 const handleAllCheckItems=async(e:any)=>{
-  let arr:any=[]
+  var arr:any=[]
   if(e.target.checked){
     Object.entries(searchedEntries).length>0 && Object.entries(searchedEntries).map(([key,value]:any)=>{
       arr.push(value.id)
@@ -363,9 +364,9 @@ const filter=async()=>{
   
   return dateMatch && userMatch && cityMatch && chainMatch && categoryMatch;
 });
-let arr:any={}
+var arr:any={}
 filteredData.map((item:any)=>{
-let obj={[item[0]]:item[1]}
+var obj={[item[0]]:item[1]}
 
 arr={...arr,...obj}
 
@@ -441,7 +442,7 @@ setSearchedEntries(arr)
       {
     Object.entries(allUsers).length>0  && Object.entries(allUsers).map(([key,val]:any)=>{
     
-    return   <option value={val.username}>{val.username}</option>
+    return   <option value={val.username} key={val.id + "123"}>{val.username}</option>
     })
     
    
@@ -470,7 +471,7 @@ setSearchedEntries(arr)
       {
     Object.entries(allCategories).length>0  && Object.entries(allCategories).map(([key,val]:any)=>{
     
-    return   <option value={val.category}>{val.category}</option>
+    return   <option value={val.category} key={val.id + "345"}>{val.category}</option>
     })
     
    

@@ -174,9 +174,9 @@ id:uniqueId,
   return userMatch
     
   })
-  let arr:any={}
+  var arr:any={}
 filteredData.map((item:any)=>{
-let obj={[item[0]]:item[1]}
+var obj={[item[0]]:item[1]}
 
 arr={...arr,...obj}
 
@@ -272,7 +272,7 @@ setSearchedUsers(arr)
       {
     Object.entries(allUsers).length>0  && Object.entries(allUsers).map(([key,val]:any)=>{
     
-    return   <option value={val.username}>{val.username}</option>
+    return   <option value={val.username} key={val.id}>{val.username}</option>
     })
     
    

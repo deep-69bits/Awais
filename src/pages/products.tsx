@@ -247,9 +247,9 @@ getProducts()
     
     return   cityMatch && chainMatch ;
   });
-  let arr:any={}
+  var arr:any={}
   filteredData.map((item:any)=>{
-  let obj={[item[0]]:item[1]}
+  var obj={[item[0]]:item[1]}
   
   arr={...arr,...obj}
   
@@ -412,7 +412,7 @@ const handleFileSelect = (event:any) => {
       {
     Object.entries(allCategories).length>0  && Object.entries(allCategories).map(([key,val]:any)=>{
     
-    return   <option value={val.category}>{val.category}</option>
+    return   <option value={val.category} key={val.id + "4567"}>{val.category}</option>
     })
     
    
@@ -504,7 +504,7 @@ const handleFileSelect = (event:any) => {
    {
     Object.entries(allCategories).length>0  && Object.entries(allCategories).map(([key,val]:any)=>{
     
-    return   <option value={val.category}>{val.category}</option>
+    return   <option value={val.category} key={val.id + "321"}>{val.category}</option>
     })
     
    
@@ -575,7 +575,7 @@ const handleFileSelect = (event:any) => {
    {
     Object.entries(allCategories).length>0  && Object.entries(allCategories).map(([key,val]:any)=>{
     
-    return   <option value={val.category}>{val.category}</option>
+    return   <option value={val.category} key={val.id + "4321"}>{val.category}</option>
     })
     
    
