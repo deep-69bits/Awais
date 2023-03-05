@@ -198,7 +198,7 @@ Object.entries(entries).map(([key,value]:any)=>{
 
 const generatePDF = () => {
  
-  let data:any=[]
+  const data:any=[]
   Object.entries(entries).map(([key,value]:any)=>{
     data.push([
       value.date,
