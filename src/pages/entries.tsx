@@ -13,7 +13,8 @@ import JSZip from 'jszip';
 import Cookies from 'js-cookie';
 
 
-import XLSX from 'xlsx'
+
+const XLSX=require('xlsx')
 import {ref as sRef,getDownloadURL} from 'firebase/storage'
 import { Modal, Button, Form } from 'react-bootstrap';
 import {toast,Toaster} from 'react-hot-toast'
