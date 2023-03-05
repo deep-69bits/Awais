@@ -202,24 +202,25 @@ const generatePDF = () => {
   const  data:any=[]
   Object.entries(entries).map(([key,value]:any)=>{
     data.push([
-      value.date,
-      value.username,
-      value.store.westCode,
-      value.store.customerId,
-      value.store.street,
-      value.store.city,
+      value?.date,
+      value?.username,
+      value?.store.westCode,
+      value?.store.customerId,
+      value?.store.street,
+      value?.store.city,
 
-      value.store.chain,
-      value.question1,
-      value.question2,
-      value.productsList?.[0]?.brandName +","+value.productsList?.[1]?.brandName+","+value.productsList?.[2]?.brandName,
-      value.urlListQ4?.[0]+ " , "+value.urlListQ4?.[1],
-      value.urlListQ5?.[0]+ " , "+value.urlListQ5?.[1],
+      value?.store.chain,
+      value?.question1,
+      value?.question2,
+      value?.productsList?.[0]?.brandName +","+value.productsList?.[1]?.brandName+","+value.productsList?.[2]?.brandName,
+      value?.urlListQ4?.[0]+ " , "+value.urlListQ4?.[1],
+      value?.urlListQ5?.[0]+ " , "+value.urlListQ5?.[1],
       
   
   
     ])
   })
+    console.log(data);
     
   const documentDefinition = {
     pageOrientation: 'landscape',
