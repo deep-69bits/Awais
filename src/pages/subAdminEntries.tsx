@@ -169,9 +169,9 @@ function exportToExcel(tableData:any, filename:any) {
   writeFile(workbook, filename);
 }
 const handleXLSX=async()=>{
-  var data:any=[]
+  const data:any=[]
 Object.entries(entries).map(([key,value]:any)=>{
-  var obj={
+  const obj={
    date:value.date,
     user:value.username,
     westCode: value.store.westCode,
@@ -196,7 +196,7 @@ Object.entries(entries).map(([key,value]:any)=>{
 
 const generatePDF = () => {
  
-  var data:any=[]
+  const  data:any=[]
   Object.entries(entries).map(([key,value]:any)=>{
     data.push([
       value.date,
@@ -294,7 +294,7 @@ const generatePDF = () => {
 };
  
 const handleAllCheckItems=async(e:any)=>{
-  var arr:any=[]
+  const arr:any=[]
   if(e.target.checked){
     Object.entries(searchedEntries).length>0 && Object.entries(searchedEntries).map(([key,value]:any)=>{
       arr.push(value.id)
@@ -318,7 +318,7 @@ const handleCheckItem=async(e:any,id:any)=>{
     })
   
   }else{
-    var arr:any=[]
+    const arr:any=[]
     checkedItems.filter((item:any)=>{
         if(item!==id){
           arr.push(item)
@@ -363,9 +363,9 @@ const filter=async()=>{
   
   return dateMatch && userMatch && cityMatch && chainMatch && categoryMatch;
 });
-var arr:any={}
+let arr:any={}
 filteredData.map((item:any)=>{
-var obj={[item[0]]:item[1]}
+const obj={[item[0]]:item[1]}
 
 arr={...arr,...obj}
 
