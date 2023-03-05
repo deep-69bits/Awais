@@ -1,5 +1,5 @@
 import React from 'react'
-import { mdiLogout, mdiClose } from '@mdi/js'
+import {  mdiClose } from '@mdi/js'
 import BaseIcon from './BaseIcon'
 import Image from 'next/image'
 import AsideMenuList from './AsideMenuList'
@@ -17,12 +17,7 @@ export default function AsideMenuLayer({ menu, className = '', ...props }: Props
   const asideScrollbarsStyle = useAppSelector((state) => state.style.asideScrollbarsStyle)
   const darkMode = useAppSelector((state) => state.style.darkMode)
 
-  const logoutItem: MenuAsideItem = {
-    label: 'Logout',
-    icon: mdiLogout,
-    color: 'info',
-    isLogout: true,
-  }
+
 
   const handleAsideLgCloseClick = (e: React.MouseEvent) => {
     e.preventDefault()

@@ -17,9 +17,9 @@ const AsideMenuItem = ({ item, isDropdownList = false }: Props) => {
   const [isLinkActive, setIsLinkActive] = useState(false)
   const [isDropdownActive, setIsDropdownActive] = useState(false)
 
-  const asideMenuItemStyle = useAppSelector((state) => state.style.asideMenuItemStyle)
-  const asideMenuDropdownStyle = useAppSelector((state) => state.style.asideMenuDropdownStyle)
-  const asideMenuItemActiveStyle = useAppSelector((state) => state.style.asideMenuItemActiveStyle)
+  const asideMenuItemStyle = useAppSelector((state:any) => state.style.asideMenuItemStyle)
+  const asideMenuDropdownStyle = useAppSelector((state:any) => state.style.asideMenuDropdownStyle)
+  const asideMenuItemActiveStyle = useAppSelector((state:any) => state.style.asideMenuItemActiveStyle)
 
   const activeClassAddon = !item.color && isLinkActive ? asideMenuItemActiveStyle : ''
 

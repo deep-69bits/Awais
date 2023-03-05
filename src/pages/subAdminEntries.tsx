@@ -137,7 +137,7 @@ const getEntries=async()=>{
 async function downloadImage(url: any, filename: any) {
   const response = await axios.get(url, { responseType: 'blob' });
 
-  
+  // Specify the folder name
   
 
   
@@ -380,14 +380,15 @@ setSearchedEntries(arr)
 
   
 }
+const handleLogout=async()=>{
+router.push('/')
+}
   return (
     <div className={`${darkMode ? 'dark' : ''}  bg-white overflow-hidden lg:overflow-visible`}>
       <div
-        className={`${layoutAsidePadding} ${
-          isAsideMobileExpanded ? '' : ''
-        } pt-14 min-h-screen w-screen transition-position lg:w-auto `}
+        className={`pt-14 min-h-screen w-screen transition-position lg:w-auto `}
       >
-        <NavBar
+        {/* <NavBar
           menu={menuNavBar}
           className={`${layoutAsidePadding} ${isAsideMobileExpanded ?  'bg-white ' : ''}`}
           >
@@ -411,14 +412,11 @@ setSearchedEntries(arr)
           menu={menuAside}
           onAsideLgClose={() => setIsAsideLgActive(false)}
         />
-        {children}
+        {children} */}
      <div className='m-4'>
        
+<Button className="btn btn-danger absolute right-4 top-4"  onClick={handleLogout}>Logout</Button>
 
-<div>
-
-
-</div>
 <div className="flex flex-col flex-wrap mb-4 md:flex-row gap-1 items-end justify-center md:justify-between py-4 px-2 lg:px-8">
   <div className="w-full md:w-1/5 lg:w-1/6">
     <label className="block mb-2 font-md text-gray-700" style={{color:"#28419a",fontWeight:"600"}} >
@@ -515,6 +513,7 @@ setSearchedEntries(arr)
           <th className='border shadow'>Street</th>
           <th className='border shadow'>City</th>
           <th className='border shadow'>Chain</th>
+       
           <th className='border shadow'>Τηρείται το πλανόγραμμα</th>
           <th className='border shadow'>Έχει καλή εικόνα το ψυγείο</th>
           <th className='border shadow'>Καταγραφή OOS Προϊόντων</th>
