@@ -14,7 +14,6 @@ import Cookies from 'js-cookie';
 
 
 
-const XLSX=require('xlsx')
 import {ref as sRef,getDownloadURL} from 'firebase/storage'
 import { Modal, Button, Form } from 'react-bootstrap';
 import {toast,Toaster} from 'react-hot-toast'
@@ -164,6 +163,8 @@ const handleImages=async()=>{
 
 }
 function exportToExcel(tableData:any, filename:any) {
+
+  const XLSX=require('xlsx')
   
   const worksheet = XLSX.utils.json_to_sheet(tableData);
   const workbook = XLSX.utils.book_new();
