@@ -247,9 +247,9 @@ getProducts()
     
     return   cityMatch && chainMatch ;
   });
-  var arr:any={}
+  let arr:any={}
   filteredData.map((item:any)=>{
-  var obj={[item[0]]:item[1]}
+  const obj={[item[0]]:item[1]}
   
   arr={...arr,...obj}
   
