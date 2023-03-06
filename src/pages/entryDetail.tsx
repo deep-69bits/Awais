@@ -123,7 +123,7 @@ const [entry,setEntry]:any=useState({})
   const layoutAsidePadding = 'xl:pl-60'
 const getEntries=async()=>{
 
-    let entr:any={}
+    
   const dbRef = ref(database);
     get(child(dbRef, `Entries/`)).then((snapshot)=>{
       if(snapshot.exists()){
