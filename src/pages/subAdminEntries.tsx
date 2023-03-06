@@ -623,7 +623,7 @@ const ImageGallery=(props:any)=>{
   </Modal.Footer>
   <style>{`
     .modal-90w {
-      max-width: 60vw;
+      max-width: 80vw;
       max-height: 50vh;
     }
     .carousel-control-prev-icon,
