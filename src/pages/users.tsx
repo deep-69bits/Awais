@@ -10,6 +10,7 @@ import AsideMenu from '../components/AsideMenu'
 import FooterBar from '../components/FooterBar'
 import { setUser } from '../stores/mainSlice'
 import { useAppDispatch, useAppSelector } from '../stores/hooks'
+import JsCookies from 'js-cookie'
 
 import {  ref, child, get,update,remove } from "firebase/database";
 import { Modal, Button, Form } from 'react-bootstrap';
@@ -50,6 +51,12 @@ const [formData2,setFormData2]:any=useState({
 })
 const [user,setUser]:any=useState("")
 let isAlready=0
+const [showModal, setShowModal] = useState(false);
+const [modalId,setModalId]:any=useState("")
+const handleDelete = () => {
+  deleteUser(modalId);
+  setShowModal(false);
+};
 
 const handleClose = () => setShow(false);
 const handleShow = () => setShow(true);
@@ -62,8 +69,13 @@ const handleShow2 = (user:any) => {
   setShow2(true)
 }
   useEffect(() => {
+    if(JsCookies.get('admin_type')==='admin'){
+
   if(Object.entries(allUsers).length<=0){
     getUsers()
+  }}
+  else{
+    router.push("/")
   }
   })
 
@@ -269,6 +281,7 @@ const handleFileSelect = (event:any) => {
      
     };
   }
+ 
   return (
     <div className='bg-white overflow-hidden lg:overflow-visible'>
       
@@ -369,7 +382,7 @@ const handleFileSelect = (event:any) => {
          </div>
        
        </button>
-       <button className="   " onClick={()=>deleteUser(value.id)}>
+       <button className="   " onClick={()=> {setModalId(value.id); setShowModal(true)}}>
          <div className="flex " style={{fontSize:"14px",color:"#28419a"}}>
          Delete
        <Icon path={mdiTrashCanOutline} size={0.8} />
@@ -431,7 +444,7 @@ const handleFileSelect = (event:any) => {
         onChange={(e)=>{setFormData({...formData,password:e.target.value})}}  required />
       </Form.Group>
 <div className=' flex-wrap justify-start mt-4'>
-<div className='flex gap-4'>
+<div className='flex gap-2'>
 <Button style={{background:"#2ec5e3",border:"none",height:"2.5rem",width:"7rem"}} type="submit">
         Add Store
       </Button>
@@ -492,6 +505,23 @@ const handleFileSelect = (event:any) => {
           
         </Modal.Body>
         
+      </Modal>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete User</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete user ?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
       </Modal>
     </div>
   )

@@ -15,7 +15,7 @@ import Icon from '@mdi/react';
 import { mdiAccountCircleOutline,mdiCubeOutline ,mdiSquareEditOutline ,mdiTrashCanOutline} from '@mdi/js';
 import { useRouter } from 'next/router'
 
-
+import JsCookies from 'js-cookie'
 import {  ref, child, get,update,remove } from "firebase/database";
 import { Modal, Button, Form } from 'react-bootstrap';
 import {toast,Toaster} from 'react-hot-toast'
@@ -52,7 +52,12 @@ const [filters,setFilterData]:any=useState({
 
 })
 let isAlready=0
-
+const [showModal, setShowModal] = useState(false);
+const [modalId,setModalId]:any=useState("")
+const handleDelete = () => {
+  deleteProduct(modalId);
+  setShowModal(false);
+};
 const handleClose = () => setShow(false);
 const handleShow = () => setShow(true);
 const handleClose2 = () => setShow2(false);
@@ -67,10 +72,14 @@ const handleShow3 = (prod:any) => {
 
 
   useEffect(() => {
+    if(JsCookies.get('admin_type')==='admin'){
     if(Object.entries(allCategories).length<=0 || Object.entries(allProducts).length<=0 ||
     Object.entries(searchedProducts).length<=0){
       getData()
       getProducts()
+    }}
+    else{
+      router.push('/')
     }
     
   })
@@ -461,7 +470,7 @@ const handleFileSelect = (event:any) => {
            </div>
          
          </button>
-         <button className="   " onClick={()=>deleteProduct(value.id)}>
+         <button className="   " onClick={()=> {setModalId(value.id); setShowModal(true)}}>
            <div className="flex "style={{fontSize:"14px",color:"#28419a"}}>
            Delete
          <Icon path={mdiTrashCanOutline} size={0.8} />
@@ -520,7 +529,7 @@ const handleFileSelect = (event:any) => {
 <div className='flex  flex-wrap justify-start mt-4'>
 <div className='flex gap-4'>
 <Button style={{background:"#2ec5e3",border:"none",height:"2.5rem",width:"7rem"}} type="submit">
-        Add Store
+        Add 
       </Button>
 <Button onClick={readCsv} style={{background:"#2ec5e3",border:"none",height:"2.5rem",width:"7rem"}} type="button">
         Read Csv
@@ -599,6 +608,22 @@ const handleFileSelect = (event:any) => {
           
         </Modal.Body>
         
+      </Modal>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Store</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete Product ?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
       </Modal>
     </div>
   )

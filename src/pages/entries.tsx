@@ -9,12 +9,13 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { format,parse } from 'date-fns'
-
+import JsCookies from 'js-cookie'
 
 import * as XLSX from 'xlsx';
 
+
 import {ref as sRef,getDownloadURL} from 'firebase/storage'
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form,Carousel  } from 'react-bootstrap';
 import {toast,Toaster} from 'react-hot-toast'
 import {database} from '../../firebase'
 import menuAside from '../menuAside'
@@ -57,16 +58,21 @@ export default function LayoutAuthenticated({ children }: Props) {
 
   })
 const [allCategories,setAllCategories]:any=useState({})
-
+const [showModal, setShowModal] = useState(false);
 const [allUsers,setAllUsers]:any=useState({})
 
   
 
   useEffect(() => {
+    if(JsCookies.get('admin_type')==='admin'){
+
+    
     if(Object.entries(entries).length<=0){
       getEntries()
       getUsers()
 
+    }}else{
+      router.push('/')
     }
   })
   const getUsers=async()=>{
@@ -100,6 +106,7 @@ const [allUsers,setAllUsers]:any=useState({})
 
   const [isAsideMobileExpanded, setIsAsideMobileExpanded] = useState(false)
   const [isAsideLgActive, setIsAsideLgActive] = useState(false)
+  const [allImages,setAllImages]:any=useState([])
 
   const router = useRouter()
 
@@ -173,6 +180,7 @@ function exportToExcel(tableData:any, filename:any) {
 const handleXLSX=async()=>{
   const data:any=[]
 Object.entries(entries).map(([key,value]:any)=>{
+  if(checkedItems.includes(value.id)){
   const obj={
    date:value.date,
     user:value.username,
@@ -192,6 +200,7 @@ Object.entries(entries).map(([key,value]:any)=>{
 
   }
   data.push(obj)
+}
 })
   exportToExcel(data, 'table.xlsx');
 }
@@ -343,8 +352,9 @@ const filter=async()=>{
  
     
   const dateMatch = (startDate && endDate)
-    ? (date >= startDate && date <= filters)
+    ? (date >= startDate && date <= endDate)
     : true;
+
   const userMatch = (filters.user)
     ? row[1]?.username?.toLowerCase().includes(filters.user.toLowerCase())
     : true;
@@ -382,7 +392,16 @@ setSearchedEntries(arr)
 
   
 }
+const ImageGallery=(props:any)=>{
+  setAllImages(props)
+  setShowModal(true)
+
+}
+
+
+
   return (
+    
     <div className={`${darkMode ? 'dark' : ''}  bg-white overflow-hidden lg:overflow-visible`}>
       <div
         className={`${layoutAsidePadding} ${
@@ -498,11 +517,11 @@ setSearchedEntries(arr)
       DOWNLOAD IMAGES
     </button>
   </div>
-  <div className="w-full md:w-auto">
+  {/* <div className="w-full md:w-auto">
     <button onClick={generatePDF} className="w-full md:w-auto  text-white  py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" style={{background:"#28419a",fontWeight:"600"}}>
       DOWNLOAD PDF
     </button>
-  </div>
+  </div> */}
 </div>
     <Table striped className='border shadow-sm' responsive hover >
       <thead >
@@ -547,7 +566,7 @@ setSearchedEntries(arr)
   <td className='border '>{value.question2}</td>
   <td className='border '>{value.productsList?.[0]?.brandName } , {value.productsList?.[1]?.brandName } , {value.productsList?.[2]?.brandName }</td>
   <td className='border '>
-    <div className='flex gap-2'>
+    <div className='flex gap-2' onClick={()=>ImageGallery(value.urlListQ4)}>
    {value.urlListQ4?.[0] && <Image src={value.urlListQ4?.[0]} alt="img" width={20} height={10}  /> } 
    {value.urlListQ4?.[1] && <Image src={value.urlListQ4?.[1]} alt="img" width={20} height={10}  /> } 
     
@@ -555,7 +574,7 @@ setSearchedEntries(arr)
     
     </div></td>
   <td className='border '><div>
-  <div className='flex gap-2'>
+  <div className='flex gap-2' onClick={()=>ImageGallery(value.urlListQ5)}>
   {value.urlListQ5?.[0] && <Image src={value.urlListQ5?.[0]} alt="img" width={20} height={10}  /> } 
    {value.urlListQ5?.[1] && <Image src={value.urlListQ5?.[1]} alt="img" width={20} height={10}  /> } 
     
@@ -566,7 +585,10 @@ setSearchedEntries(arr)
 <div className='flex gap-2' style={{color:"#28419a"}}>
 
     <Icon path={mdiSquareEditOutline} size={0.8}  />
-    <Icon path={mdiTextBoxSearchOutline} size={0.8}  />
+    <div  onClick={()=>router.push(`/entryDetail?id=${value.id}`)} >
+    <Icon path={mdiTextBoxSearchOutline} size={0.8} />
+
+    </div>
 </div>
 </td>
 
@@ -584,11 +606,46 @@ setSearchedEntries(arr)
 
 
 
+    <Modal show={showModal} onHide={() => setShowModal(false)} dialogClassName="modal-90w" >
+  <Modal.Header closeButton>
+    <Modal.Title>All Images</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Carousel>
+      {allImages?.map((url:any) => (
+        <Carousel.Item key={url}>
+          <img src={url} alt="img" style={{ height: "50vh", width: "100%", objectFit: "contain" }} />
+        </Carousel.Item>
+      ))}
+    </Carousel>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={() => setShowModal(false)}>
+      Close
+    </Button>
+  </Modal.Footer>
+  <style>{`
+    .modal-90w {
+      max-width: 60vw;
+      max-height: 50vh;
+    }
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      background-color: black;
+      border-radius: 10%;
+      padding: 0.5rem;
+    }
+  `}</style>
+</Modal>
 
        
-
+     
        </div>
       </div>
     </div>
+  
   )
+
+
+ 
 }

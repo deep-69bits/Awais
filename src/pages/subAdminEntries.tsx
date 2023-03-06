@@ -9,13 +9,13 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { format,parse } from 'date-fns'
-
-
+import JsCookies from 'js-cookie'
 
 import * as XLSX from 'xlsx';
 
+
 import {ref as sRef,getDownloadURL} from 'firebase/storage'
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form,Carousel  } from 'react-bootstrap';
 import {toast,Toaster} from 'react-hot-toast'
 import {database} from '../../firebase'
 import menuAside from '../menuAside'
@@ -58,16 +58,21 @@ export default function LayoutAuthenticated({ children }: Props) {
 
   })
 const [allCategories,setAllCategories]:any=useState({})
-
+const [showModal, setShowModal] = useState(false);
 const [allUsers,setAllUsers]:any=useState({})
 
   
 
   useEffect(() => {
+    if(JsCookies.get('admin_type')==='sub-admin'){
+
+    
     if(Object.entries(entries).length<=0){
       getEntries()
       getUsers()
 
+    }}else{
+      router.push('/')
     }
   })
   const getUsers=async()=>{
@@ -101,6 +106,7 @@ const [allUsers,setAllUsers]:any=useState({})
 
   const [isAsideMobileExpanded, setIsAsideMobileExpanded] = useState(false)
   const [isAsideLgActive, setIsAsideLgActive] = useState(false)
+  const [allImages,setAllImages]:any=useState([])
 
   const router = useRouter()
 
@@ -138,7 +144,7 @@ const getEntries=async()=>{
 async function downloadImage(url: any, filename: any) {
   const response = await axios.get(url, { responseType: 'blob' });
 
-  // Specify the folder name
+  
   
 
   
@@ -163,9 +169,9 @@ const handleImages=async()=>{
 
 }
 function exportToExcel(tableData:any, filename:any) {
+
   
-
-
+  
   const worksheet = XLSX.utils.json_to_sheet(tableData);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
@@ -174,6 +180,7 @@ function exportToExcel(tableData:any, filename:any) {
 const handleXLSX=async()=>{
   const data:any=[]
 Object.entries(entries).map(([key,value]:any)=>{
+  if(checkedItems.includes(value.id)){
   const obj={
    date:value.date,
     user:value.username,
@@ -193,34 +200,34 @@ Object.entries(entries).map(([key,value]:any)=>{
 
   }
   data.push(obj)
+}
 })
   exportToExcel(data, 'table.xlsx');
 }
 
 const generatePDF = () => {
  
-  const  data:any=[]
+  const data:any=[]
   Object.entries(entries).map(([key,value]:any)=>{
     data.push([
-      value?.date,
-      value?.username,
-      value?.store.westCode,
-      value?.store.customerId,
-      value?.store.street,
-      value?.store.city,
+      value.date,
+      value.username,
+      value.store.westCode,
+      value.store.customerId,
+      value.store.street,
+      value.store.city,
 
-      value?.store.chain,
-      value?.question1,
-      value?.question2,
-      value?.productsList?.[0]?.brandName +","+value.productsList?.[1]?.brandName+","+value.productsList?.[2]?.brandName,
-      value?.urlListQ4?.[0]+ " , "+value.urlListQ4?.[1],
-      value?.urlListQ5?.[0]+ " , "+value.urlListQ5?.[1],
+      value.store.chain,
+      value.question1,
+      value.question2,
+      value.productsList?.[0]?.brandName +","+value.productsList?.[1]?.brandName+","+value.productsList?.[2]?.brandName,
+      value.urlListQ4?.[0]+ " , "+value.urlListQ4?.[1],
+      value.urlListQ5?.[0]+ " , "+value.urlListQ5?.[1],
       
   
   
     ])
   })
-    console.log(data);
     
   const documentDefinition = {
     pageOrientation: 'landscape',
@@ -332,6 +339,10 @@ const handleCheckItem=async(e:any,id:any)=>{
   }
 
 }
+const handleLogout=async()=>{
+  JsCookies.remove('admin_type')
+  router.push('/')
+}
 const filter=async()=>{
   const filteredData = Object.entries(entries).filter((row:any) => {
     let startDate:any;
@@ -345,8 +356,9 @@ const filter=async()=>{
  
     
   const dateMatch = (startDate && endDate)
-    ? (date >= startDate && date <= filters)
+    ? (date >= startDate && date <= endDate)
     : true;
+
   const userMatch = (filters.user)
     ? row[1]?.username?.toLowerCase().includes(filters.user.toLowerCase())
     : true;
@@ -384,14 +396,18 @@ setSearchedEntries(arr)
 
   
 }
-const handleLogout=async()=>{
-router.push('/')
+const ImageGallery=(props:any)=>{
+  setAllImages(props)
+  setShowModal(true)
+
 }
+
+
+
   return (
-    <div className={`${darkMode ? 'dark' : ''}  bg-white overflow-hidden lg:overflow-visible`}>
-      <div
-        className={`pt-14 min-h-screen w-screen transition-position lg:w-auto `}
-      >
+    
+    <div className={`${darkMode ? 'dark' : ''} `}>
+     
         {/* <NavBar
           menu={menuNavBar}
           className={`${layoutAsidePadding} ${isAsideMobileExpanded ?  'bg-white ' : ''}`}
@@ -409,8 +425,8 @@ router.push('/')
             <BaseIcon path={mdiMenu} size="24" />
           </NavBarItemPlain>
          
-        </NavBar>
-        <AsideMenu
+        </NavBar> */}
+        {/* <AsideMenu
           isAsideMobileExpanded={isAsideMobileExpanded}
           isAsideLgActive={isAsideLgActive}
           menu={menuAside}
@@ -418,8 +434,8 @@ router.push('/')
         />
         {children} */}
      <div className='m-4'>
-       
-<Button className="btn btn-danger absolute right-4 top-4"  onClick={handleLogout}>Logout</Button>
+     <Button className="btn btn-danger absolute right-4 top-4"  onClick={handleLogout}>Logout</Button>
+
 
 <div className="flex flex-col flex-wrap mb-4 md:flex-row gap-1 items-end justify-center md:justify-between py-4 px-2 lg:px-8">
   <div className="w-full md:w-1/5 lg:w-1/6">
@@ -443,7 +459,7 @@ router.push('/')
       {
     Object.entries(allUsers).length>0  && Object.entries(allUsers).map(([key,val]:any)=>{
     
-    return   <option value={val.username} key={val.id +"313"}>{val.username}</option>
+    return   <option value={val.username} key={val.id + "123"}>{val.username}</option>
     })
     
    
@@ -472,7 +488,7 @@ router.push('/')
       {
     Object.entries(allCategories).length>0  && Object.entries(allCategories).map(([key,val]:any)=>{
     
-    return   <option value={val.category} key={val.id +"654"}>{val.category}</option>
+    return   <option value={val.category} key={val.id + "345"}>{val.category}</option>
     })
     
    
@@ -498,11 +514,11 @@ router.push('/')
       DOWNLOAD IMAGES
     </button>
   </div>
-  <div className="w-full md:w-auto">
+  {/* <div className="w-full md:w-auto">
     <button onClick={generatePDF} className="w-full md:w-auto  text-white  py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" style={{background:"#28419a",fontWeight:"600"}}>
       DOWNLOAD PDF
     </button>
-  </div>
+  </div> */}
 </div>
     <Table striped className='border shadow-sm' responsive hover >
       <thead >
@@ -517,7 +533,6 @@ router.push('/')
           <th className='border shadow'>Street</th>
           <th className='border shadow'>City</th>
           <th className='border shadow'>Chain</th>
-       
           <th className='border shadow'>Τηρείται το πλανόγραμμα</th>
           <th className='border shadow'>Έχει καλή εικόνα το ψυγείο</th>
           <th className='border shadow'>Καταγραφή OOS Προϊόντων</th>
@@ -548,7 +563,7 @@ router.push('/')
   <td className='border '>{value.question2}</td>
   <td className='border '>{value.productsList?.[0]?.brandName } , {value.productsList?.[1]?.brandName } , {value.productsList?.[2]?.brandName }</td>
   <td className='border '>
-    <div className='flex gap-2'>
+    <div className='flex gap-2' onClick={()=>ImageGallery(value.urlListQ4)}>
    {value.urlListQ4?.[0] && <Image src={value.urlListQ4?.[0]} alt="img" width={20} height={10}  /> } 
    {value.urlListQ4?.[1] && <Image src={value.urlListQ4?.[1]} alt="img" width={20} height={10}  /> } 
     
@@ -556,7 +571,7 @@ router.push('/')
     
     </div></td>
   <td className='border '><div>
-  <div className='flex gap-2'>
+  <div className='flex gap-2' onClick={()=>ImageGallery(value.urlListQ5)}>
   {value.urlListQ5?.[0] && <Image src={value.urlListQ5?.[0]} alt="img" width={20} height={10}  /> } 
    {value.urlListQ5?.[1] && <Image src={value.urlListQ5?.[1]} alt="img" width={20} height={10}  /> } 
     
@@ -567,7 +582,10 @@ router.push('/')
 <div className='flex gap-2' style={{color:"#28419a"}}>
 
     <Icon path={mdiSquareEditOutline} size={0.8}  />
-    <Icon path={mdiTextBoxSearchOutline} size={0.8}  />
+    <div  onClick={()=>router.push(`/entryDetail?id=${value.id}`)} >
+    <Icon path={mdiTextBoxSearchOutline} size={0.8} />
+
+    </div>
 </div>
 </td>
 
@@ -585,11 +603,46 @@ router.push('/')
 
 
 
+    <Modal show={showModal} onHide={() => setShowModal(false)} dialogClassName="modal-90w" >
+  <Modal.Header closeButton>
+    <Modal.Title>All Images</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Carousel>
+      {allImages?.map((url:any) => (
+        <Carousel.Item key={url}>
+          <img src={url} alt="img" style={{ height: "50vh", width: "100%", objectFit: "contain" }} />
+        </Carousel.Item>
+      ))}
+    </Carousel>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={() => setShowModal(false)}>
+      Close
+    </Button>
+  </Modal.Footer>
+  <style>{`
+    .modal-90w {
+      max-width: 60vw;
+      max-height: 50vh;
+    }
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      background-color: black;
+      border-radius: 10%;
+      padding: 0.5rem;
+    }
+  `}</style>
+</Modal>
 
        
-
+     
        </div>
       </div>
-    </div>
+    
+  
   )
+
+
+ 
 }

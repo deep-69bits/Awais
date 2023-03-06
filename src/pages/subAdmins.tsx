@@ -10,6 +10,7 @@ import AsideMenu from '../components/AsideMenu'
 import FooterBar from '../components/FooterBar'
 import { setUser } from '../stores/mainSlice'
 import { useAppDispatch, useAppSelector } from '../stores/hooks'
+import JsCookies from 'js-cookie'
 
 import {  ref, child, get,update ,remove} from "firebase/database";
 import { Modal, Button, Form } from 'react-bootstrap';
@@ -55,9 +56,15 @@ const handleShow2 = (user:any) => {
   
   setShow2(true)
 }
+
   useEffect(() => {
+    if(JsCookies.get('admin_type')==='admin'){
+
   if(Object.entries(allUsers).length<=0){
     getUsers()
+  }}else{
+    router.push("/")
+
   }
   })
 
@@ -67,7 +74,13 @@ const handleShow2 = (user:any) => {
   const [isAsideLgActive, setIsAsideLgActive] = useState(false)
 
   const router = useRouter()
-
+  const [showModal, setShowModal] = useState(false);
+  const [modalId,setModalId]:any=useState("")
+  const handleDelete = () => {
+    deleteUser(modalId);
+    setShowModal(false);
+  };
+  
   useEffect(() => {
     const handleRouteChangeStart = () => {
       setIsAsideMobileExpanded(false)
@@ -314,7 +327,7 @@ setSearchedUsers(arr)
          </div>
        
        </button>
-       <button className="   " onClick={()=>deleteUser(value.id)}>
+       <button className="   " onClick={()=> {setModalId(value.id); setShowModal(true)}}>
          <div className="flex " style={{fontSize:"14px",color:"#28419a"}}>
          Delete
        <Icon path={mdiTrashCanOutline} size={0.8} />
@@ -407,6 +420,22 @@ setSearchedUsers(arr)
           
         </Modal.Body>
         
+      </Modal>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete User</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete user ?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
       </Modal>
       
     </div>

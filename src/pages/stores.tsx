@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { mdiForwardburger, mdiTextBoxSearchOutline,mdiBackburger, mdiMenu,mdiSquareEditOutline ,mdiTrashCanOutline } from '@mdi/js'
 
 import Icon from '@mdi/react';
+import JsCookies from 'js-cookie'
 
 
 import menuAside from '../menuAside'
@@ -67,11 +68,20 @@ const handleShow2= (store:any) =>{
 
 
   useEffect(() => {
+    if(JsCookies.get('admin_type')==='admin'){
    if(Object.entries(allStores).length<=0 || Object.entries(searchedStores).length<=0){
     getStores()
+   }}
+   else{
+    router.push("/",undefined,{shallow:true})
    }
   })
-
+  const [showModal, setShowModal] = useState(false);
+  const [modalId,setModalId]:any=useState("")
+  const handleDelete = () => {
+    deleteStore(modalId);
+    setShowModal(false);
+  };
   const darkMode = useAppSelector((state) => state.style.darkMode)
 
   const [isAsideMobileExpanded, setIsAsideMobileExpanded] = useState(false)
@@ -353,7 +363,7 @@ const readCsvFile=async(file:any)=>{
     
     <td>
 <div className='flex gap-2' style={{color:"#28419a"}}>
-  <div onClick={()=>deleteStore(value.id)}>
+  <div onClick={()=> {setModalId(value.id); setShowModal(true)}}>
   <Icon path={mdiTrashCanOutline} size={0.8}   />
   </div>
 
@@ -504,6 +514,22 @@ const readCsvFile=async(file:any)=>{
           
         </Modal.Body>
         
+      </Modal>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Store</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete Store ?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
       </Modal>
     </div>
   )
