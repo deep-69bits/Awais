@@ -14,7 +14,14 @@ const AdminForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+useEffect(()=>{
+if(JsCookie.get("admin_type")==="admin"){
+  router.push("entries")
+}else if(JsCookie.get("admin_type")==="sub-admin"){
+  router.push("subAdminEntries")
 
+}
+},[])
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if(formType === 'admin'){
