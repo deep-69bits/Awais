@@ -615,9 +615,7 @@ const handleLogout=async()=>{
 <td>
 <div className='flex gap-2' style={{color:"#28419a"}}>
 
-<div onClick={()=>deleteEntry(value.id)}>
-<Icon path={mdiTrashCanOutline} size={0.8}  />
-</div>
+
     
     <div  onClick={()=>router.push(`/entryDetail?id=${value.id}`)} >
     <Icon path={mdiTextBoxSearchOutline} size={0.8} />
