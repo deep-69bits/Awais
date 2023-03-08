@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect } from 'react'
 import { useState } from 'react'
 import Icon from '@mdi/react';
-import {  ref, child, get,update } from "firebase/database";
+import {  ref, child, get,update,remove } from "firebase/database";
 import { saveAs } from 'file-saver';
 import { writeFile } from 'xlsx';
 import {storage} from '../../firebase'
@@ -46,6 +46,7 @@ export default function LayoutAuthenticated({ children }: Props) {
   
 
   const [entries,setEntries]:any=useState({})
+  const [order,setOrder]:any=useState("asc")
   const [searchedEntries,setSearchedEntries]:any=useState({})
   const [checkedItems,setCheckedItems]:any=useState([])
   const [filters,setFilterData]:any=useState({
@@ -61,10 +62,28 @@ const [allCategories,setAllCategories]:any=useState({})
 const [showModal, setShowModal] = useState(false);
 const [allUsers,setAllUsers]:any=useState({})
 
-  
+const ITEMS_PER_PAGE = 3;
+
+const [currentPage, setCurrentPage] = useState(1);
+
+let totalItems = Object.entries(searchedEntries).length;
+let totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+let start = (currentPage - 1) * ITEMS_PER_PAGE;
+let end = start + ITEMS_PER_PAGE;
+let currentItems = Object.entries(searchedEntries).slice(start, end); 
+
+const handlePrevPage = () => {
+  setCurrentPage(prevPage => prevPage - 1);
+};
+
+const handleNextPage = () => {
+  setCurrentPage(prevPage => prevPage + 1);
+};
+
 
   useEffect(() => {
-    if(JsCookies.get('admin_type')==='sub-admin'){
+    if(JsCookies.get('admin_type')==='admin'){
 
     
     if(Object.entries(entries).length<=0){
@@ -127,6 +146,7 @@ const [allUsers,setAllUsers]:any=useState({})
 
   const layoutAsidePadding = 'xl:pl-60'
 const getEntries=async()=>{
+  
   const dbRef = ref(database);
     get(child(dbRef, `Entries/`)).then((snapshot)=>{
       if(snapshot.exists()){
@@ -139,6 +159,13 @@ const getEntries=async()=>{
 
 
     })
+    
+ totalItems = Object.entries(searchedEntries).length;
+ totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+ start = (currentPage - 1) * ITEMS_PER_PAGE;
+ end = start + ITEMS_PER_PAGE;
+ currentItems = Object.entries(searchedEntries).slice(start, end); 
 }
 
 async function downloadImage(url: any, filename: any) {
@@ -202,7 +229,12 @@ Object.entries(entries).map(([key,value]:any)=>{
   data.push(obj)
 }
 })
+if(data.length>0){
   exportToExcel(data, 'table.xlsx');
+}
+else{
+  toast.error('please select at least one entry')
+}
 }
 
 const generatePDF = () => {
@@ -339,10 +371,6 @@ const handleCheckItem=async(e:any,id:any)=>{
   }
 
 }
-const handleLogout=async()=>{
-  JsCookies.remove('admin_type')
-  router.push('/')
-}
 const filter=async()=>{
   const filteredData = Object.entries(entries).filter((row:any) => {
     let startDate:any;
@@ -389,7 +417,12 @@ arr={...arr,...obj}
 })
 
 setSearchedEntries(arr)
+ totalItems = Object.entries(arr).length;
+ totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
+ start = (currentPage - 1) * ITEMS_PER_PAGE;
+ end = start + ITEMS_PER_PAGE;
+ currentItems = Object.entries(arr).slice(start, end); 
 
 
 
@@ -403,40 +436,41 @@ const ImageGallery=(props:any)=>{
 }
 
 
+const deleteEntry=async(id:any)=>{
+  toast.loading('Loading...')
+  const dbRef = ref(database,`/Entries/${id}`);
+  remove(dbRef).then(()=>{
+    toast.remove()
+    toast.success("entry Deleted")
+    getEntries()
+    getUsers()
 
+  
+  })
+
+
+}
+
+const handleLogout=async()=>{
+  JsCookies.remove('admin_type');
+
+    
+  router.push('/', undefined, { shallow: true });
+}
   return (
     
-    <div className={`${darkMode ? 'dark' : ''} `}>
-     
-        {/* <NavBar
-          menu={menuNavBar}
-          className={`${layoutAsidePadding} ${isAsideMobileExpanded ?  'bg-white ' : ''}`}
-          >
-          <NavBarItemPlain
-            display="flex lg:hidden"
-            onClick={() => setIsAsideMobileExpanded(!isAsideMobileExpanded)}
-          >
-            <BaseIcon path={isAsideMobileExpanded ? mdiBackburger : mdiForwardburger} size="24" />
-          </NavBarItemPlain>
-          <NavBarItemPlain
-            display="hidden lg:flex xl:hidden"
-            onClick={() => setIsAsideLgActive(true)}
-          >
-            <BaseIcon path={mdiMenu} size="24" />
-          </NavBarItemPlain>
-         
-        </NavBar> */}
-        {/* <AsideMenu
-          isAsideMobileExpanded={isAsideMobileExpanded}
-          isAsideLgActive={isAsideLgActive}
-          menu={menuAside}
-          onAsideLgClose={() => setIsAsideLgActive(false)}
-        />
-        {children} */}
+    <div className="bg-white overflow-hidden lg:overflow-visible">
+      <Toaster/>
+  <Button className="btn btn-danger absolute right-4 top-4"  onClick={handleLogout}>Logout</Button>
+      
+       
      <div className='m-4'>
-     <Button className="btn btn-danger absolute right-4 top-4"  onClick={handleLogout}>Logout</Button>
+       
+
+<div>
 
 
+</div>
 <div className="flex flex-col flex-wrap mb-4 md:flex-row gap-1 items-end justify-center md:justify-between py-4 px-2 lg:px-8">
   <div className="w-full md:w-1/5 lg:w-1/6">
     <label className="block mb-2 font-md text-gray-700" style={{color:"#28419a",fontWeight:"600"}} >
@@ -525,7 +559,7 @@ const ImageGallery=(props:any)=>{
         <tr className='border shadow' style={{fontSize:"9px",fontWeight:"bold"}} >
           <th className='border'>
             <input type='checkbox' onChange={handleAllCheckItems} className='rounded shadow'/>
-            <label className='ml-6'>Date</label>
+            <label className='ml-6' >Date</label>
           </th>
           <th className='border shadow'>User</th>
           <th className='border shadow'>West Code</th>
@@ -544,12 +578,12 @@ const ImageGallery=(props:any)=>{
       </thead>
       <tbody>
       {
-  Object.entries(searchedEntries).length>0 && Object.entries(searchedEntries).map(([key,value]:any)=>{
+  currentItems.length>0 && currentItems.map(([key,value]:any)=>{
     return <tr className='shadow ' style={{fontSize:"10px"}} key={value.id}>
     <td className='border  '>
       <div className='flex items-center'>
       <input type='checkbox' checked={checkedItems?.includes(value.id)? true:false} onChange={(e)=>handleCheckItem(e,value.id)} className='rounded '/>
-    <label className='ml-8'>{value.date}</label>
+    <label className='ml-8'>{format(parse(value.date, 'MM-dd-yyyy', new Date()), 'dd-MM-yyyy')}</label>
       </div>
    
     </td>
@@ -581,7 +615,10 @@ const ImageGallery=(props:any)=>{
 <td>
 <div className='flex gap-2' style={{color:"#28419a"}}>
 
-    <Icon path={mdiSquareEditOutline} size={0.8}  />
+<div onClick={()=>deleteEntry(value.id)}>
+<Icon path={mdiTrashCanOutline} size={0.8}  />
+</div>
+    
     <div  onClick={()=>router.push(`/entryDetail?id=${value.id}`)} >
     <Icon path={mdiTextBoxSearchOutline} size={0.8} />
 
@@ -601,6 +638,25 @@ const ImageGallery=(props:any)=>{
       </tbody>
     </Table>
 
+    <div className="flex justify-end items-center" >
+  <button
+    className="bg-blue-500 hover:bg-blue-700 text-white font-md py-1 px-4 rounded mr-2"
+    disabled={currentPage === 1}
+    onClick={handlePrevPage}
+    style={{background:"#28419a",fontWeight:"600",textTransform:"uppercase"}}
+  >
+    Previous
+  </button>
+  <span className="text-gray-700">{`Page ${currentPage} of ${totalPages}`}</span>
+  <button
+    className="bg-blue-500 hover:bg-blue-700 text-white font-md py-1 px-4 rounded ml-2"
+    disabled={currentPage === totalPages}
+    onClick={handleNextPage}
+    style={{background:"#28419a",fontWeight:"600",textTransform:"uppercase"}}
+  >
+    Next
+  </button>
+</div>
 
 
     <Modal show={showModal} onHide={() => setShowModal(false)} dialogClassName="modal-90w" >
