@@ -45,6 +45,7 @@ export default function LayoutAuthenticated({ children }: Props) {
   const dispatch = useAppDispatch()
   
 
+  const [allDateChecked,setAllDate]:any=useState(false)
   const [entries,setEntries]:any=useState({})
   const [order,setOrder]:any=useState("asc")
   const [searchedEntries,setSearchedEntries]:any=useState({})
@@ -75,15 +76,20 @@ let currentItems = Object.entries(searchedEntries).slice(start, end);
 
 const handlePrevPage = () => {
   setCurrentPage(prevPage => prevPage - 1);
+  setAllDate(false)
+  setCheckedItems([])
 };
 
 const handleNextPage = () => {
   setCurrentPage(prevPage => prevPage + 1);
+  setAllDate(false)
+
+  setCheckedItems([])
 };
 
 
   useEffect(() => {
-    if(JsCookies.get('admin_type')==='admin'){
+    if(JsCookies.get('admin_type')==='sub-admin'){
 
     
     if(Object.entries(entries).length<=0){
@@ -339,12 +345,14 @@ const generatePDF = () => {
 const handleAllCheckItems=async(e:any)=>{
   const arr:any=[]
   if(e.target.checked){
-    Object.entries(searchedEntries).length>0 && Object.entries(searchedEntries).map(([key,value]:any)=>{
+    setAllDate(true)
+    currentItems.length>0 && currentItems.map(([key,value]:any)=>{
       arr.push(value.id)
     })
   
     setCheckedItems(arr)
   }else{
+    setAllDate(false)
     setCheckedItems([])
   }
 
@@ -459,11 +467,10 @@ const handleLogout=async()=>{
 }
   return (
     
-    <div className="bg-white overflow-hidden lg:overflow-visible">
+    <div className='bg-white overflow-hidden lg:overflow-visible'>
       <Toaster/>
   <Button className="btn btn-danger absolute right-4 top-4"  onClick={handleLogout}>Logout</Button>
       
-       
      <div className='m-4'>
        
 
@@ -558,7 +565,7 @@ const handleLogout=async()=>{
       <thead >
         <tr className='border shadow' style={{fontSize:"9px",fontWeight:"bold"}} >
           <th className='border'>
-            <input type='checkbox' onChange={handleAllCheckItems} className='rounded shadow'/>
+            <input type='checkbox' onChange={handleAllCheckItems} checked={allDateChecked} className='rounded shadow'/>
             <label className='ml-6' >Date</label>
           </th>
           <th className='border shadow'>User</th>
@@ -615,7 +622,9 @@ const handleLogout=async()=>{
 <td>
 <div className='flex gap-2' style={{color:"#28419a"}}>
 
-
+{/* <div onClick={()=>deleteEntry(value.id)}>
+<Icon path={mdiTrashCanOutline} size={0.8}  />
+</div> */}
     
     <div  onClick={()=>router.push(`/entryDetail?id=${value.id}`)} >
     <Icon path={mdiTextBoxSearchOutline} size={0.8} />

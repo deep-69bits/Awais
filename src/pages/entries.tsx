@@ -45,6 +45,7 @@ export default function LayoutAuthenticated({ children }: Props) {
   const dispatch = useAppDispatch()
   
 
+  const [allDateChecked,setAllDate]:any=useState(false)
   const [entries,setEntries]:any=useState({})
   const [order,setOrder]:any=useState("asc")
   const [searchedEntries,setSearchedEntries]:any=useState({})
@@ -75,10 +76,15 @@ let currentItems = Object.entries(searchedEntries).slice(start, end);
 
 const handlePrevPage = () => {
   setCurrentPage(prevPage => prevPage - 1);
+  setAllDate(false)
+  setCheckedItems([])
 };
 
 const handleNextPage = () => {
   setCurrentPage(prevPage => prevPage + 1);
+  setAllDate(false)
+
+  setCheckedItems([])
 };
 
 
@@ -339,12 +345,14 @@ const generatePDF = () => {
 const handleAllCheckItems=async(e:any)=>{
   const arr:any=[]
   if(e.target.checked){
-    Object.entries(searchedEntries).length>0 && Object.entries(searchedEntries).map(([key,value]:any)=>{
+    setAllDate(true)
+    currentItems.length>0 && currentItems.map(([key,value]:any)=>{
       arr.push(value.id)
     })
   
     setCheckedItems(arr)
   }else{
+    setAllDate(false)
     setCheckedItems([])
   }
 
@@ -580,7 +588,7 @@ const deleteEntry=async(id:any)=>{
       <thead >
         <tr className='border shadow' style={{fontSize:"9px",fontWeight:"bold"}} >
           <th className='border'>
-            <input type='checkbox' onChange={handleAllCheckItems} className='rounded shadow'/>
+            <input type='checkbox' onChange={handleAllCheckItems} checked={allDateChecked} className='rounded shadow'/>
             <label className='ml-6' >Date</label>
           </th>
           <th className='border shadow'>User</th>
