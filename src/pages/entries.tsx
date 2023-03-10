@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react'
+import React, { ReactNode, useEffect,useRef } from 'react'
 import { useState } from 'react'
 import Icon from '@mdi/react';
 import {  ref, child, get,update,remove } from "firebase/database";
@@ -10,8 +10,11 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { format,parse } from 'date-fns'
 import JsCookies from 'js-cookie'
+import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 
 import {ref as sRef,getDownloadURL} from 'firebase/storage'
@@ -44,7 +47,7 @@ type Props = {
 export default function LayoutAuthenticated({ children }: Props) {
   const dispatch = useAppDispatch()
   
-
+  const elementRef = useRef(null);
   const [allDateChecked,setAllDate]:any=useState(false)
   const [entries,setEntries]:any=useState({})
   const [order,setOrder]:any=useState("asc")
@@ -73,7 +76,27 @@ let totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 let start = (currentPage - 1) * ITEMS_PER_PAGE;
 let end = start + ITEMS_PER_PAGE;
 let currentItems = Object.entries(searchedEntries).slice(start, end); 
-
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: 'column',
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    fontSize: 12,
+  },
+  section: {
+    margin: 10,
+    padding: 10,
+    flexGrow: 1,
+  },
+  heading: {
+    fontSize: 24,
+    marginBottom: 10,
+    fontWeight: 'bold',
+  },
+  paragraph: {
+    marginBottom: 10,
+  },
+});
 const handlePrevPage = () => {
   setCurrentPage(prevPage => prevPage - 1);
   setAllDate(false)
@@ -86,7 +109,12 @@ const handleNextPage = () => {
 
   setCheckedItems([])
 };
-
+const [showModal2, setShowModal2] = useState(false);
+const [modalId,setModalId]:any=useState("")
+const handleDelete = () => {
+  deleteEntry(modalId);
+  setShowModal2(false);
+};
 
   useEffect(() => {
     if(JsCookies.get('admin_type')==='admin'){
@@ -242,105 +270,153 @@ else{
   toast.error('please select at least one entry')
 }
 }
+const generatePDF = async () => {
+  const canvas = await html2canvas(document.querySelector('#table'));
+  const imgData = canvas.toDataURL('image/png');
+  const pdf:any = new jsPDF();
+  pdf?.addImage(imgData);
+  pdf.save("table.pdf");
+};
 
-const generatePDF = () => {
- 
-  const data:any=[]
-  Object.entries(entries).map(([key,value]:any)=>{
-    data.push([
-      value.date,
-      value.username,
-      value.store.westCode,
-      value.store.customerId,
-      value.store.street,
-      value.store.city,
+// const generatePDF = () => {
+//   let documentDefinition:any;
+//   const data:any=[]
+//   Object.entries(entries).map(([key,value]:any)=>{
+//     data.push([
+//       value.date,
+//       value.username,
+//       value.store.westCode,
+//       value.store.customerId,
+//       value.store.street,
+//       value.store.city,
 
-      value.store.chain,
-      value.question1,
-      value.question2,
-      value.productsList?.[0]?.brandName +","+value.productsList?.[1]?.brandName+","+value.productsList?.[2]?.brandName,
-      value.urlListQ4?.[0]+ " , "+value.urlListQ4?.[1],
-      value.urlListQ5?.[0]+ " , "+value.urlListQ5?.[1],
+//       value.store.chain,
+//       value.question1,
+//       value.question2,
+//       value.productsList?.[0]?.brandName +","+value.productsList?.[1]?.brandName+","+value.productsList?.[2]?.brandName,
+//       value.urlListQ4?.[0]+ " , "+value.urlListQ4?.[1],
+//       value.urlListQ5?.[0]+ " , "+value.urlListQ5?.[1],
       
   
   
-    ])
-  })
-    
-  const documentDefinition = {
-    pageOrientation: 'landscape',
-    content: [
-      { text: 'My Table', style: 'header' },
-      {
-        style: 'table',
-        table: {
-          headerRows: 1,
-          widths: ['8.33%','8.33%','8.33%','8.33%','8.33%','8.33%','8.33%','8.33%','8.33%','8.33%','8.33%','8.33%'],
-          body: [
-            [
-              { text: 'Date', style: 'tableHeader' },
-              { text: 'User', style: 'tableHeader' },
-              { text: 'west Code', style: 'tableHeader' },
-              { text: 'Customer Id', style: 'tableHeader' },
-              { text: 'street', style: 'tableHeader' },
-              { text: 'city ', style: 'tableHeader' },
-              { text: 'chain ', style: 'tableHeader' },
-              { text: 'ηρείται το πλανόγραμμα; ', style: 'tableHeader' },
-              { text: 'χει καλή εικόνατο σημείο;', style: 'tableHeader' },
-              { text: 'Καταγραφή OOS Προϊόντων', style: 'tableHeader' },
-              { text: 'Φωτογραφία καταστήματος', style: 'tableHeader' },
-              { text: 'Φωτογραφία Ψυγείου ', style: 'tableHeader' },
+//     ])
+//   })
+//   const imageUrl = 'https://firebasestorage.googleapis.com/v0/b/wor-project.appspot.com/o/Pictures%2F1677839841073.jpg?alt=media&token=b52a123d-54c9-443a-b6ea-cfd326b3d724';
+// let imageDataUrl:any=""
+//   // fetch the image as a blob
+//   fetch(imageUrl)
+//     .then(response => response.blob())
+//     .then(blob => {
+//       // create a new FileReader object
+//       const reader = new FileReader();
+  
+//       // when the FileReader has finished loading the image,
+//       // convert it to a data URL and pass it to pdfMake
+//       reader.onload = () => {
+//          imageDataUrl = reader.result;
+//          documentDefinition = {
+//           pageSize: 'A4',
+//           pageMargins: [40, 60, 40, 60],
+//           content: [
+//             {
+//               layout: {
+//                 defaultBorder: false,
+//               },
+//               table: {
+//                 widths: ['*'],
+//                 body: [
+//                   [
+//                     {
+//                       stack: [
+//                         {
+//                           table: {
+//                             widths: ['*', 'auto'],
+//                             body: [
+//                               [
+//                                 {
+//                                   image:imageDataUrl,
+//                                   width: 70,
+//                                   height: 70,
+//                                   margin: [0, 0, 20, 0],
+//                                 },
+//                                 {
+//                                   stack: [
+//                                     { text: 'Header Text Line 1', style: 'headerText' },
+//                                     { text: 'Header Text Line 2', style: 'headerText' },
+//                                     { text: 'Header Text Line 3', style: 'headerText' },
+//                                   ],
+//                                 },
+//                               ],
+//                             ],
+//                           },
+//                         },
+//                         {
+//                           text: 'Header Text Line 4',
+//                           style: 'headerText',
+//                           alignment: 'right',
+//                           margin: [0, 20, 0, 0],
+//                         },
+//                       ],
+//                     },
+//                   ],
+//                 ],
+//               },
+//             },
+//             {
+//               text: 'Body Text Line 1',
+//               style: 'bodyText',
+//             },
+//             {
+//               image:imageDataUrl,
+//               fit: [500, 500],
+//               margin: [0, 20, 0, 20],
+//             },
+//             {
+//               text: 'Body Text Line 2',
+//               style: 'bodyText',
+//             },
+//             {
+//               image:imageDataUrl,
+//               fit: [500, 500],
+//               margin: [0, 20, 0, 20],
+//             },
+//             {
+//               text: 'Body Text Line 3',
+//               style: 'bodyText',
+//             },
+//             {
+//               image:imageDataUrl,
+//               fit: [500, 500],
+//               margin: [0, 20, 0, 20],
+//             },
+//           ],
+//           styles: {
+//             headerText: {
+//               fontSize: 18,
+//               bold: true,
+//             },
+//             bodyText: {
+//               fontSize: 14,
+//               margin: [0, 10, 0, 10],
+//             },
+//           },
+//         };
+      
+        
+//       };
+  
+//       // read the blob as a data URL
+//       reader.readAsDataURL(blob);
+//     })
+//     .catch(error => {
+//       console.error(error);
+//     });
+   
 
+//   pdfMake.createPdf(documentDefinition).download("table.pdf");
+// };
+ 
 
-
-            ],
-            ...data,
-          ],
-        },
-        layout: {
-          hLineWidth: function(i:any, node:any) {
-            return (i === 0 || i === node.table.body.length) ? 0 : 1;
-          },
-          vLineWidth: function(i:any, node:any) {
-            return 0;
-          },
-          hLineColor: function(i:any, node:any) {
-            return (i === 0 || i === node.table.body.length) ? 'white' : 'gray';
-          },
-          paddingTop: function(i:any, node:any) { return 5; },
-          paddingBottom: function(i:any, node:any) { return 5; },
-          paddingLeft: function(i:any, node:any) { return 5; },
-          paddingRight: function(i:any, node:any) { return 5; },
-          columnGap: 10,
-          fillColor: function(i:any, node:any) {
-            return (i % 2 === 0) ? '#CCCCCC' : null;
-          },
-        },
-      },
-    ],
-    styles: {
-      header: {
-        fontSize: 18,
-        bold: true,
-        alignment: 'center',
-        margin: [0, 0, 0, 10],
-      },
-      table: {
-        margin: [0, 5, 0, 15],
-        maxWidth: 800,
-      },
-      tableHeader: {
-        bold: true,
-        fontSize: 12,
-        color: 'black',
-        fillColor: '#CCCCCC',
-        noWrap: false,
-      },
-    },
-  };
-
-  pdfMake.createPdf(documentDefinition).download("table.pdf");
-};
  
 const handleAllCheckItems=async(e:any)=>{
   const arr:any=[]
@@ -501,7 +577,7 @@ const deleteEntry=async(id:any)=>{
 
 
 </div>
-<div className="flex flex-col flex-wrap mb-4 md:flex-row gap-1 items-end justify-center md:justify-between py-4 px-2 lg:px-8">
+<div  id="table" className="flex flex-col flex-wrap mb-4 md:flex-row gap-1 items-end justify-center md:justify-between py-4 px-2 lg:px-8">
   <div className="w-full md:w-1/5 lg:w-1/6">
     <label className="block mb-2 font-md text-gray-700" style={{color:"#28419a",fontWeight:"600"}} >
       Start Date
@@ -584,7 +660,7 @@ const deleteEntry=async(id:any)=>{
     </button>
   </div> */}
 </div>
-    <Table striped className='border shadow-sm' responsive hover >
+    <Table striped className='border shadow-sm' responsive hover ref={elementRef} >
       <thead >
         <tr className='border shadow' style={{fontSize:"9px",fontWeight:"bold"}} >
           <th className='border'>
@@ -645,7 +721,7 @@ const deleteEntry=async(id:any)=>{
 <td>
 <div className='flex gap-2' style={{color:"#28419a"}}>
 
-<div onClick={()=>deleteEntry(value.id)}>
+<div onClick={()=> {setModalId(value.id); setShowModal2(true)}}>
 <Icon path={mdiTrashCanOutline} size={0.8}  />
 </div>
     
@@ -720,6 +796,22 @@ const deleteEntry=async(id:any)=>{
     }
   `}</style>
 </Modal>
+<Modal show={showModal2} onHide={() => setShowModal2(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Store</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete Entry ?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
        
      
