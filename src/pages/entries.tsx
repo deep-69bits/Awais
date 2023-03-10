@@ -10,14 +10,13 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { format,parse } from 'date-fns'
 import JsCookies from 'js-cookie'
-import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
-import ReactImageZoom from 'react-image-zoom';
+
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 
-import {ref as sRef,getDownloadURL} from 'firebase/storage'
+
 import { Modal, Button, Form,Carousel  } from 'react-bootstrap';
 import {toast,Toaster} from 'react-hot-toast'
 import {database} from '../../firebase'
@@ -29,7 +28,7 @@ import NavBarItemPlain from '../components/NavBarItemPlain'
 import AsideMenu from '../components/AsideMenu'
 import axios from 'axios';
 
-import { setUser } from '../stores/mainSlice'
+
 import { useAppDispatch, useAppSelector } from '../stores/hooks'
 import Image from 'next/image';
 
@@ -76,27 +75,7 @@ let totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 let start = (currentPage - 1) * ITEMS_PER_PAGE;
 let end = start + ITEMS_PER_PAGE;
 let currentItems = Object.entries(searchedEntries).slice(start, end); 
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: 'column',
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    fontSize: 12,
-  },
-  section: {
-    margin: 10,
-    padding: 10,
-    flexGrow: 1,
-  },
-  heading: {
-    fontSize: 24,
-    marginBottom: 10,
-    fontWeight: 'bold',
-  },
-  paragraph: {
-    marginBottom: 10,
-  },
-});
+
 const handlePrevPage = () => {
   setCurrentPage(prevPage => prevPage - 1);
   setAllDate(false)
@@ -278,144 +257,6 @@ const generatePDF = async () => {
   pdf.save("table.pdf");
 };
 
-// const generatePDF = () => {
-//   let documentDefinition:any;
-//   const data:any=[]
-//   Object.entries(entries).map(([key,value]:any)=>{
-//     data.push([
-//       value.date,
-//       value.username,
-//       value.store.westCode,
-//       value.store.customerId,
-//       value.store.street,
-//       value.store.city,
-
-//       value.store.chain,
-//       value.question1,
-//       value.question2,
-//       value.productsList?.[0]?.brandName +","+value.productsList?.[1]?.brandName+","+value.productsList?.[2]?.brandName,
-//       value.urlListQ4?.[0]+ " , "+value.urlListQ4?.[1],
-//       value.urlListQ5?.[0]+ " , "+value.urlListQ5?.[1],
-      
-  
-  
-//     ])
-//   })
-//   const imageUrl = 'https://firebasestorage.googleapis.com/v0/b/wor-project.appspot.com/o/Pictures%2F1677839841073.jpg?alt=media&token=b52a123d-54c9-443a-b6ea-cfd326b3d724';
-// let imageDataUrl:any=""
-//   // fetch the image as a blob
-//   fetch(imageUrl)
-//     .then(response => response.blob())
-//     .then(blob => {
-//       // create a new FileReader object
-//       const reader = new FileReader();
-  
-//       // when the FileReader has finished loading the image,
-//       // convert it to a data URL and pass it to pdfMake
-//       reader.onload = () => {
-//          imageDataUrl = reader.result;
-//          documentDefinition = {
-//           pageSize: 'A4',
-//           pageMargins: [40, 60, 40, 60],
-//           content: [
-//             {
-//               layout: {
-//                 defaultBorder: false,
-//               },
-//               table: {
-//                 widths: ['*'],
-//                 body: [
-//                   [
-//                     {
-//                       stack: [
-//                         {
-//                           table: {
-//                             widths: ['*', 'auto'],
-//                             body: [
-//                               [
-//                                 {
-//                                   image:imageDataUrl,
-//                                   width: 70,
-//                                   height: 70,
-//                                   margin: [0, 0, 20, 0],
-//                                 },
-//                                 {
-//                                   stack: [
-//                                     { text: 'Header Text Line 1', style: 'headerText' },
-//                                     { text: 'Header Text Line 2', style: 'headerText' },
-//                                     { text: 'Header Text Line 3', style: 'headerText' },
-//                                   ],
-//                                 },
-//                               ],
-//                             ],
-//                           },
-//                         },
-//                         {
-//                           text: 'Header Text Line 4',
-//                           style: 'headerText',
-//                           alignment: 'right',
-//                           margin: [0, 20, 0, 0],
-//                         },
-//                       ],
-//                     },
-//                   ],
-//                 ],
-//               },
-//             },
-//             {
-//               text: 'Body Text Line 1',
-//               style: 'bodyText',
-//             },
-//             {
-//               image:imageDataUrl,
-//               fit: [500, 500],
-//               margin: [0, 20, 0, 20],
-//             },
-//             {
-//               text: 'Body Text Line 2',
-//               style: 'bodyText',
-//             },
-//             {
-//               image:imageDataUrl,
-//               fit: [500, 500],
-//               margin: [0, 20, 0, 20],
-//             },
-//             {
-//               text: 'Body Text Line 3',
-//               style: 'bodyText',
-//             },
-//             {
-//               image:imageDataUrl,
-//               fit: [500, 500],
-//               margin: [0, 20, 0, 20],
-//             },
-//           ],
-//           styles: {
-//             headerText: {
-//               fontSize: 18,
-//               bold: true,
-//             },
-//             bodyText: {
-//               fontSize: 14,
-//               margin: [0, 10, 0, 10],
-//             },
-//           },
-//         };
-      
-        
-//       };
-  
-//       // read the blob as a data URL
-//       reader.readAsDataURL(blob);
-//     })
-//     .catch(error => {
-//       console.error(error);
-//     });
-   
-
-//   pdfMake.createPdf(documentDefinition).download("table.pdf");
-// };
- 
 
  
 const handleAllCheckItems=async(e:any)=>{
