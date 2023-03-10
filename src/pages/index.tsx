@@ -23,9 +23,11 @@ if(JsCookie.get("admin_type")==="admin"){
 }
 },[])
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    
+    
     event.preventDefault();
     if(formType === 'admin'){
-      //get data from firebase realtime database AdminKey and check it is correct
+      
       
       const starCountRef = ref(database, 'AdminKey');
       onValue(starCountRef, (snapshot) => {
@@ -42,7 +44,7 @@ if(JsCookie.get("admin_type")==="admin"){
       
     }else{
 
-      //get data from firebase realtime database Users and check it is correct
+      
       const starCountRef = ref(database, 'SubAdmins');
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();

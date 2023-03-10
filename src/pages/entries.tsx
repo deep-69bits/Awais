@@ -11,7 +11,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { format,parse } from 'date-fns'
 import JsCookies from 'js-cookie'
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
-
+import ReactImageZoom from 'react-image-zoom';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -773,8 +773,8 @@ const deleteEntry=async(id:any)=>{
     <Carousel>
       {allImages?.map((url:any) => (
         <Carousel.Item key={url}>
-          <img src={url} alt="img" style={{ height: "50vh", width: "100%", objectFit: "contain" }} />
-        </Carousel.Item>
+        <img src={url} alt="img" style={{ height:"100vh", width: "100%", objectFit: "contain" }} />
+      </Carousel.Item>
       ))}
     </Carousel>
   </Modal.Body>

@@ -469,7 +469,11 @@ const handleLogout=async()=>{
     
     <div className='bg-white overflow-hidden lg:overflow-visible'>
       <Toaster/>
-  <Button className="btn btn-danger absolute right-4 top-4"  onClick={handleLogout}>Logout</Button>
+      <div className='flex justify-between items-center p-4 '>
+        <Image alt='image' src={"logo_1.png"} width={80} height={80}/>
+      <Button className="btn btn-danger absolute right-4 top-4"  onClick={handleLogout}>Logout</Button>
+
+      </div>
       
      <div className='m-4'>
        
@@ -674,7 +678,7 @@ const handleLogout=async()=>{
     <Carousel>
       {allImages?.map((url:any) => (
         <Carousel.Item key={url}>
-          <img src={url} alt="img" style={{ height: "50vh", width: "100%", objectFit: "contain" }} />
+          <img src={url} alt="img" style={{ height:"100vh", width: "100%", objectFit: "contain" }} />
         </Carousel.Item>
       ))}
     </Carousel>
