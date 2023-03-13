@@ -161,7 +161,7 @@ const handleDelete = () => {
 const getEntries=async()=>{
   
   const dbRef = ref(database);
-  let enrt:any={}
+  
     get(child(dbRef, `Entries/`)).then((snapshot)=>{
       if(snapshot.exists()){
         const res=snapshot.val()
