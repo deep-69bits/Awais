@@ -65,7 +65,7 @@ const [allCategories,setAllCategories]:any=useState({})
 const [showModal, setShowModal] = useState(false);
 const [allUsers,setAllUsers]:any=useState({})
 
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 50;
 
 const [currentPage, setCurrentPage] = useState(1);
 
@@ -161,24 +161,73 @@ const handleDelete = () => {
 const getEntries=async()=>{
   
   const dbRef = ref(database);
+  let enrt:any={}
     get(child(dbRef, `Entries/`)).then((snapshot)=>{
       if(snapshot.exists()){
         const res=snapshot.val()
         setEntries(res)
         setSearchedEntries(res)
+
+
+
+      
+  
+
+  
+  
+      //   if(order==="desc"){
+      //     // sort entr in descending order
+      //     let sortedEntries:any={}
+      //     Object.entries(enrt).sort((a:any,b:any)=>{
+      //       return new Date(a[1].date).getTime() - new Date(b[1].date).getTime()
+      //     }
+      //     ).map(([key,value]:any)=>{
+      //       sortedEntries[key]=value
+      //     }
+      //     )
+          
+      //     Object.entries(sortedEntries).sort((a:any,b:any)=>{
+      //       return new Date(a[1].date).getTime() - new Date(b[1].date).getTime()
+      //     }
+      //     ).map(([key,value]:any)=>{
+      //       sortedEntries[key]=value
+      //     }
+      //     )
+      // console.log(sortedEntries);
+      
+      //   }else{
+      //     // sort entr  on the base of date
+      //     let sortedEntries:any={}
+      //     Object.entries(enrt).sort((a:any,b:any)=>{
+      //       return new Date(b[1].date).getTime() - new Date(a[1].date).getTime()
+      //     }).map(([key,value]:any)=>{
+      //       sortedEntries[key]=value
+      //     })
         
+      // console.log(sortedEntries);
+      
+      //   }
        
       }
 
 
     })
     
+  
+ 
+
  totalItems = Object.entries(searchedEntries).length;
  totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
  start = (currentPage - 1) * ITEMS_PER_PAGE;
  end = start + ITEMS_PER_PAGE;
  currentItems = Object.entries(searchedEntries).slice(start, end); 
+ 
+ 
+
+
+ 
+
 }
 
 async function downloadImage(url: any, filename: any) {
@@ -376,7 +425,15 @@ const deleteEntry=async(id:any)=>{
 
 }
 
-
+const changeOrder=async()=>{
+  if(order==="asc"){
+    getEntries()
+  setOrder("desc")
+  }else{
+   getEntries()
+    setOrder("asc")
+  }
+}
   return (
     
     <div className={`${darkMode ? 'dark' : ''}  bg-white overflow-hidden lg:overflow-visible`}>
@@ -506,7 +563,7 @@ const deleteEntry=async(id:any)=>{
         <tr className='border shadow' style={{fontSize:"9px",fontWeight:"bold"}} >
           <th className='border'>
             <input type='checkbox' onChange={handleAllCheckItems} checked={allDateChecked} className='rounded shadow'/>
-            <label className='ml-6' >Date</label>
+            <label className='ml-6' onClick={changeOrder} >Date</label>
           </th>
           <th className='border shadow'>User</th>
           <th className='border shadow'>West Code</th>
@@ -645,7 +702,7 @@ const deleteEntry=async(id:any)=>{
           Are you sure you want to delete Entry ?
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+          <Button variant="secondary" onClick={() => setShowModal2(false)}>
             Cancel
           </Button>
           <Button variant="danger" onClick={handleDelete}>

@@ -63,7 +63,7 @@ const [allCategories,setAllCategories]:any=useState({})
 const [showModal, setShowModal] = useState(false);
 const [allUsers,setAllUsers]:any=useState({})
 
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 50;
 
 const [currentPage, setCurrentPage] = useState(1);
 
