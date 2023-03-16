@@ -14,7 +14,7 @@ import JsCookies from 'js-cookie'
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import Head from 'next/head';
+// import Head from 'next/head';
 
 
 
@@ -438,7 +438,7 @@ const changeOrder=async()=>{
   return (
     
     <div className={`${darkMode ? 'dark' : ''}  bg-white overflow-hidden lg:overflow-visible`}>
-    <Head>
+    {/* <Head>
   <script
     dangerouslySetInnerHTML={{
       __html: `
@@ -454,7 +454,7 @@ const changeOrder=async()=>{
       `,
     }}
   />
-</Head>
+</Head> */}
       <Toaster/>
       <div
         className={`${layoutAsidePadding} ${
