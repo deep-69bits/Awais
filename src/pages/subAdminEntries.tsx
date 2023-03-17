@@ -12,6 +12,7 @@ import { format,parse } from 'date-fns'
 import JsCookies from 'js-cookie'
 
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
 
 
 import {ref as sRef,getDownloadURL} from 'firebase/storage'
@@ -62,6 +63,7 @@ export default function LayoutAuthenticated({ children }: Props) {
 const [allCategories,setAllCategories]:any=useState({})
 const [showModal, setShowModal] = useState(false);
 const [allUsers,setAllUsers]:any=useState({})
+const [PdfLoader,setPdfLoader]=useState(false);
 
 const ITEMS_PER_PAGE = 50;
 
@@ -151,29 +153,268 @@ const handleNextPage = () => {
   }, [router.events, dispatch])
 
   const layoutAsidePadding = 'xl:pl-60'
-const getEntries=async()=>{
+  const getEntries=async()=>{
   
-  const dbRef = ref(database);
-    get(child(dbRef, `Entries/`)).then((snapshot)=>{
-      if(snapshot.exists()){
-        const res=snapshot.val()
-        setEntries(res)
-        setSearchedEntries(res)
-        
-       
-      }
-
-
-    })
+    const dbRef = ref(database);
     
- totalItems = Object.entries(searchedEntries).length;
- totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
- start = (currentPage - 1) * ITEMS_PER_PAGE;
- end = start + ITEMS_PER_PAGE;
- currentItems = Object.entries(searchedEntries).slice(start, end); 
-}
-
+      get(child(dbRef, `Entries/`)).then((snapshot)=>{
+        if(snapshot.exists()){
+          const res=snapshot.val()
+          
+  let arr:any=[]
+          Object.entries(res).map(([key,value]:any)=>{
+            arr.push(value)
+            
+          })
+  
+  
+  
+          
+          arr.reverse()
+          
+          
+          setEntries(arr)
+          setSearchedEntries(arr)
+  
+        
+    
+  
+    
+    
+        //   if(order==="desc"){
+        //     // sort entr in descending order
+        //     let sortedEntries:any={}
+        //     Object.entries(enrt).sort((a:any,b:any)=>{
+        //       return new Date(a[1].date).getTime() - new Date(b[1].date).getTime()
+        //     }
+        //     ).map(([key,value]:any)=>{
+        //       sortedEntries[key]=value
+        //     }
+        //     )
+            
+        //     Object.entries(sortedEntries).sort((a:any,b:any)=>{
+        //       return new Date(a[1].date).getTime() - new Date(b[1].date).getTime()
+        //     }
+        //     ).map(([key,value]:any)=>{
+        //       sortedEntries[key]=value
+        //     }
+        //     )
+        // console.log(sortedEntries);
+        
+        //   }else{
+        //     // sort entr  on the base of date
+        //     let sortedEntries:any={}
+        //     Object.entries(enrt).sort((a:any,b:any)=>{
+        //       return new Date(b[1].date).getTime() - new Date(a[1].date).getTime()
+        //     }).map(([key,value]:any)=>{
+        //       sortedEntries[key]=value
+        //     })
+          
+        // console.log(sortedEntries);
+        
+        //   }
+         
+        }
+  
+  
+      })
+      
+    
+   
+  
+   totalItems = Object.entries(searchedEntries).length;
+   totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  
+   start = (currentPage - 1) * ITEMS_PER_PAGE;
+   end = start + ITEMS_PER_PAGE;
+   currentItems = Object.entries(searchedEntries).slice(start, end); 
+   
+   
+  
+  
+   
+  
+  }
+  const handleDownloadPDF= async ()=>{
+  
+    // set loader 
+    setPdfLoader(true);
+    // gets the checked records
+    let DataForPdf=[]
+  Object.entries(searchedEntries).length>0 && Object.entries(searchedEntries).map(([key,value]:any)=>{
+    if(checkedItems.includes(value.id)){
+      DataForPdf.push(value);
+    }   
+  })
+  
+  // do nothing if user hav't selected any record
+  if(DataForPdf.length===0)
+  {
+    setPdfLoader(false);
+    return;
+  }
+  
+  var doc = new jsPDF();
+  
+  let iterationNumber=0;  // check the iteration to add new page 
+  for (const item of DataForPdf){
+  
+    var backgroundColor = '#E6E7E9';
+    // Define the logo dimensions
+    var logoWidth = 40;
+    var logoHeight = 20;
+    // Define the background color height
+    var backgroundColorHeight = 30;
+    // Set the font size
+    doc.setFontSize(12);
+    // Set the background color
+    doc.setFillColor(backgroundColor);
+    // Set the position and size of the background color
+    doc.rect(0, 0, doc.internal.pageSize.width, backgroundColorHeight, 'F');
+    // add logo
+    doc.addImage("logo_1.png", 'PNG', 5, 5, logoWidth, logoHeight);
+    //  construct the header info
+    const userInfo = `Date: ${item.date} User: ${item.username} | West code: ${item.store.westCode} | customer Id: ${item.userId}`;
+    const addressInfo = `Street: ${item.store.street} | City: ${item.store.city} | chain: ${item.store.chain}`;
+    const otherInfo = `The planogram is followed: ${item.question1} |  Does the refrigerator have a good image: ${item.question2}`;
+    let productsInfo="OOS Products: ";
+    for (let i = 0; i < item.productsList.length; i++) {
+      const product = item.productsList[i];
+      productsInfo=productsInfo +` ${product.brandName}  ${product.category}`
+    }
+  
+    // set the x and y coordinates for the header info 
+    const x = doc.internal.pageSize.getWidth() - 110;
+    const y = 10;
+    doc.setFontSize(8);
+    // add the header info  to the PDF
+    doc.text(userInfo, x , y);
+    doc.text(addressInfo, x+30 , y + 5);
+    doc.text(otherInfo, x , y + 10);
+    doc.text(productsInfo, x , y + 15);
+  
+    
+    //  define images grid params
+    var imgWidth = 80;
+    var imgHeight = 120;
+    var gap = 10;
+    
+    // Define margin values
+    var marginTop = 35;
+    var marginLeft = (doc.internal.pageSize.width - (imgWidth * 2 + gap)) / 2;
+      
+    // adding the image urls to fetch those images from url list 4
+      let promises4=[];
+    for (var i = 0; i < item?.urlListQ4?.length; i++) {     
+      promises4.push(getImageData(item.urlListQ4[i]));
+    }
+  
+    // fetch  images from url list 4
+    const base64Images4 = [];
+  for (const promise of promises4) {
+    const base64Image = await promise;
+    base64Images4.push(base64Image);
+    }
+  
+    
+    // Adding the images to pdf from url list 4
+    let postionprops=0;
+    for (var i = 0; i < base64Images4.length; i++) {
+      // Calculate x and y position based on postionprops
+      var xpos = marginLeft + (postionprops % 2) * (imgWidth + gap);
+      var ypos = marginTop + Math.floor(postionprops / 2) * (imgHeight + gap);
+  
+      // Add image to page
+      doc.addImage(base64Images4[i], 'JPEG', xpos, ypos, imgWidth, imgHeight);
+      // Add new page if four images have been added
+      if ((i + 1) % 4 === 0 || postionprops===3) {
+        doc.addPage();
+        postionprops=0;
+      }
+      else
+      {
+        postionprops=postionprops+1;
+      }
+    }
+  
+  
+   
+    
+  // adding the image urls to fetch those images from url list 5
+    let promises5=[];
+    for (var i = 0; i < item.urlListQ5?.length; i++) {     
+      promises5.push(getImageData(item.urlListQ5[i]));
+    }
+  
+    // fetch  images from url list 5
+    const base64Images5 = [];
+  for (const promise of promises5) {
+  const base64Image = await promise;
+  base64Images5.push(base64Image);
+    }
+  
+    // add page if there no space left on the previous page 
+    if(postionprops==3)
+    {
+      doc.addPage();
+      postionprops=0;
+    }
+  
+    // Adding the images to pdf from url list 5
+    for (var i = 0; i < base64Images5.length; i++) {
+      // Calculate x and y position based on index
+      var xpos = marginLeft + (postionprops % 2) * (imgWidth + gap);
+      var ypos = marginTop + Math.floor(postionprops / 2) * (imgHeight + gap);
+    
+      // Add image to page
+      doc.addImage(base64Images5[i], 'JPEG', xpos, ypos, imgWidth, imgHeight);
+    
+      // Add new page if four images have been added
+      if ((i + 1) % 4 === 0 || postionprops===3) {
+        doc.addPage();
+        postionprops=0;
+      }
+      else
+      {
+        postionprops=postionprops+1;
+      }
+    }
+  
+    // Add Page if it is not the last record.
+    if(iterationNumber!==DataForPdf.length-1)
+    {
+      doc.addPage();
+    }
+  
+    // add 1 to iteration number 
+    iterationNumber=iterationNumber+1;
+  
+  }
+  
+  
+  doc.save('document.pdf');
+  setPdfLoader(false);
+  
+  
+  }
+  const  getImageData=async(imageUrl:any)=> {
+    
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const base64Img = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+          resolve(reader.result);
+        };
+      });
+      return base64Img;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
 async function downloadImage(url: any, filename: any) {
   const response = await axios.get(url, { responseType: 'blob' });
 
@@ -187,11 +428,11 @@ async function downloadImage(url: any, filename: any) {
 const handleImages=async()=>{
   Object.entries(searchedEntries).length>0 && Object.entries(searchedEntries).map(([key,value]:any)=>{
     if(checkedItems.includes(value.id)){
-      value.urlListQ4.forEach((item:any)=>{
+      value.urlListQ4?.forEach((item:any)=>{
         downloadImage(item, `${value.date}_${value.store.westCode}.jpg`);
         
       })
-      value.urlListQ5.forEach((item:any)=>{
+      value.urlListQ5?.forEach((item:any)=>{
         downloadImage(item, `${value.date}_${value.store.westCode}.jpg`);
         
       })
@@ -564,6 +805,25 @@ const handleLogout=async()=>{
       DOWNLOAD PDF
     </button>
   </div> */}
+   <div className="w-full md:w-auto">
+  <button onClick={handleDownloadPDF} disabled={PdfLoader===true?true:false} className="w-full md:w-auto inline-flex space-x-2 items-center  text-white font-md py-2 px-4 bg-indigo-800 rounded focus:outline-none focus:shadow-outline" type="button" style={{fontWeight:"600"}}>
+      {
+        PdfLoader===true?(
+          <>
+           <svg aria-hidden="true" className="w-4 h-4 mr-2 text-white animate-spin dark:text-gray-600 fill-blue-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+    </svg>
+    <span>Processing</span>
+    </>
+        ):(
+          <span>DOWNLOAD PDF</span>
+        )
+      }
+   
+      
+    </button>
+    </div>
 </div>
     <Table striped className='border shadow-sm' responsive hover >
       <thead >
@@ -606,7 +866,8 @@ const handleLogout=async()=>{
   <td className='border '>{value.store.chain}</td>
   <td className='border '>{value.question1}</td>
   <td className='border '>{value.question2}</td>
-  <td className='border '>{value.productsList?.[0]?.brandName } , {value.productsList?.[1]?.brandName } , {value.productsList?.[2]?.brandName }</td>
+  <td className='border '>{value.productsList?.[0]?.brandName? value.productsList?.[0]?.brandName +" , ":"" } {value.productsList?.[1]?.brandName? value.productsList?.[1]?.brandName +" , ":"" } {value.productsList?.[2]?.brandName? value.productsList?.[2]?.brandName +" , ":"" } {value.productsList?.[3]?.brandName? value.productsList?.[3]?.brandName +" , ":"" } {value.productsList?.[4]?.brandName? value.productsList?.[5]?.brandName +" , ":"" } {value.productsList?.[6]?.brandName? value.productsList?.[6]?.brandName +" , ":"" }   </td>
+ 
   <td className='border '>
     <div className='flex gap-2' onClick={()=>ImageGallery(value.urlListQ4)}>
    {value.urlListQ4?.[0] && <Image src={value.urlListQ4?.[0]} alt="img" width={20} height={10}  /> } 
