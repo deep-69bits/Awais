@@ -261,17 +261,17 @@ if(DataForPdf.length===0)
   return;
 }
 
-var doc = new jsPDF();
+let doc = new jsPDF();
 
 let iterationNumber=0;  // check the iteration to add new page 
 for (const item of DataForPdf){
 
-  var backgroundColor = '#E6E7E9';
+  let backgroundColor = '#E6E7E9';
   // Define the logo dimensions
-  var logoWidth = 40;
-  var logoHeight = 20;
+  let logoWidth = 40;
+  let logoHeight = 20;
   // Define the background color height
-  var backgroundColorHeight = 30;
+  let backgroundColorHeight = 30;
   // Set the font size
   doc.setFontSize(12);
   // Set the background color
@@ -302,17 +302,17 @@ for (const item of DataForPdf){
 
   
   //  define images grid params
-  var imgWidth = 80;
-  var imgHeight = 120;
-  var gap = 10;
+  let imgWidth = 80;
+  let imgHeight = 120;
+  let gap = 10;
   
   // Define margin values
-  var marginTop = 35;
-  var marginLeft = (doc.internal.pageSize.width - (imgWidth * 2 + gap)) / 2;
+  let marginTop = 35;
+  let marginLeft = (doc.internal.pageSize.width - (imgWidth * 2 + gap)) / 2;
     
   // adding the image urls to fetch those images from url list 4
     let promises4=[];
-  for (var i = 0; i < item?.urlListQ4?.length; i++) {     
+  for (let i = 0; i < item?.urlListQ4?.length; i++) {     
     promises4.push(getImageData(item.urlListQ4[i]));
   }
 
@@ -326,10 +326,10 @@ for (const promise of promises4) {
   
   // Adding the images to pdf from url list 4
   let postionprops=0;
-  for (var i = 0; i < base64Images4.length; i++) {
+  for (let i = 0; i < base64Images4.length; i++) {
     // Calculate x and y position based on postionprops
-    var xpos = marginLeft + (postionprops % 2) * (imgWidth + gap);
-    var ypos = marginTop + Math.floor(postionprops / 2) * (imgHeight + gap);
+    let xpos = marginLeft + (postionprops % 2) * (imgWidth + gap);
+    let ypos = marginTop + Math.floor(postionprops / 2) * (imgHeight + gap);
 
     // Add image to page
     doc.addImage(base64Images4[i], 'JPEG', xpos, ypos, imgWidth, imgHeight);
@@ -349,7 +349,7 @@ for (const promise of promises4) {
   
 // adding the image urls to fetch those images from url list 5
   let promises5=[];
-  for (var i = 0; i < item.urlListQ5?.length; i++) {     
+  for (let i = 0; i < item.urlListQ5?.length; i++) {     
     promises5.push(getImageData(item.urlListQ5[i]));
   }
 
@@ -368,10 +368,10 @@ base64Images5.push(base64Image);
   }
 
   // Adding the images to pdf from url list 5
-  for (var i = 0; i < base64Images5.length; i++) {
+  for (let i = 0; i < base64Images5.length; i++) {
     // Calculate x and y position based on index
-    var xpos = marginLeft + (postionprops % 2) * (imgWidth + gap);
-    var ypos = marginTop + Math.floor(postionprops / 2) * (imgHeight + gap);
+    let xpos = marginLeft + (postionprops % 2) * (imgWidth + gap);
+    let ypos = marginTop + Math.floor(postionprops / 2) * (imgHeight + gap);
   
     // Add image to page
     doc.addImage(base64Images5[i], 'JPEG', xpos, ypos, imgWidth, imgHeight);
