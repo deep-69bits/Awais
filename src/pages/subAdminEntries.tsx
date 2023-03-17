@@ -322,7 +322,7 @@ const handleNextPage = () => {
     for (let i = 0; i < base64Images4.length; i++) {
       // Calculate x and y position based on postionprops
       const xpos = marginLeft + (postionprops % 2) * (imgWidth + gap);
-      let ypos = marginTop + Math.floor(postionprops / 2) * (imgHeight + gap);
+      const ypos = marginTop + Math.floor(postionprops / 2) * (imgHeight + gap);
   
       // Add image to page
       doc.addImage(base64Images4[i], 'JPEG', xpos, ypos, imgWidth, imgHeight);
@@ -341,7 +341,7 @@ const handleNextPage = () => {
    
     
   // adding the image urls to fetch those images from url list 5
-    let promises5=[];
+    const promises5=[];
     for (let i = 0; i < item.urlListQ5?.length; i++) {     
       promises5.push(getImageData(item.urlListQ5[i]));
     }
