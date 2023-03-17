@@ -161,7 +161,7 @@ const handleNextPage = () => {
         if(snapshot.exists()){
           const res=snapshot.val()
           
-  let arr:any=[]
+  const arr:any=[]
           Object.entries(res).map(([key,value]:any)=>{
             arr.push(value)
             
@@ -240,7 +240,7 @@ const handleNextPage = () => {
     // set loader 
     setPdfLoader(true);
     // gets the checked records
-    let DataForPdf=[]
+    const DataForPdf=[]
   Object.entries(searchedEntries).length>0 && Object.entries(searchedEntries).map(([key,value]:any)=>{
     if(checkedItems.includes(value.id)){
       DataForPdf.push(value);
@@ -254,17 +254,17 @@ const handleNextPage = () => {
     return;
   }
   
-  let doc = new jsPDF();
+  const doc = new jsPDF();
   
   let iterationNumber=0;  // check the iteration to add new page 
   for (const item of DataForPdf){
   
-    let backgroundColor = '#E6E7E9';
+    const backgroundColor = '#E6E7E9';
     // Define the logo dimensions
-    let logoWidth = 40;
-    let logoHeight = 20;
+    const logoWidth = 40;
+    const logoHeight = 20;
     // Define the background color height
-    let backgroundColorHeight = 30;
+    const backgroundColorHeight = 30;
     // Set the font size
     doc.setFontSize(12);
     // Set the background color
@@ -295,16 +295,16 @@ const handleNextPage = () => {
   
     
     //  define images grid params
-    let imgWidth = 80;
-    let imgHeight = 120;
-    let gap = 10;
+    const imgWidth = 80;
+    const imgHeight = 120;
+    const gap = 10;
     
     // Define margin values
-    let marginTop = 35;
-    let marginLeft = (doc.internal.pageSize.width - (imgWidth * 2 + gap)) / 2;
+    const marginTop = 35;
+    const marginLeft = (doc.internal.pageSize.width - (imgWidth * 2 + gap)) / 2;
       
     // adding the image urls to fetch those images from url list 4
-      let promises4=[];
+      const promises4=[];
     for (let i = 0; i < item?.urlListQ4?.length; i++) {     
       promises4.push(getImageData(item.urlListQ4[i]));
     }
@@ -321,7 +321,7 @@ const handleNextPage = () => {
     let postionprops=0;
     for (let i = 0; i < base64Images4.length; i++) {
       // Calculate x and y position based on postionprops
-      let xpos = marginLeft + (postionprops % 2) * (imgWidth + gap);
+      const xpos = marginLeft + (postionprops % 2) * (imgWidth + gap);
       let ypos = marginTop + Math.floor(postionprops / 2) * (imgHeight + gap);
   
       // Add image to page
@@ -363,8 +363,8 @@ const handleNextPage = () => {
     // Adding the images to pdf from url list 5
     for (let i = 0; i < base64Images5.length; i++) {
       // Calculate x and y position based on index
-      let xpos = marginLeft + (postionprops % 2) * (imgWidth + gap);
-      let ypos = marginTop + Math.floor(postionprops / 2) * (imgHeight + gap);
+      const xpos = marginLeft + (postionprops % 2) * (imgWidth + gap);
+      const ypos = marginTop + Math.floor(postionprops / 2) * (imgHeight + gap);
     
       // Add image to page
       doc.addImage(base64Images5[i], 'JPEG', xpos, ypos, imgWidth, imgHeight);
