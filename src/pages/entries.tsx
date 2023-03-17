@@ -767,7 +767,7 @@ const changeOrder=async()=>{
     </button>
   </div> */}
   <div className="w-full md:w-auto">
-  <button onClick={handleDownloadPDF} disabled={PdfLoader===true?true:false} className="w-full md:w-auto inline-flex space-x-2 items-center  text-white font-md py-2 px-4 bg-indigo-800 rounded focus:outline-none focus:shadow-outline" type="button" style={{fontWeight:"600"}}>
+  <button onClick={handleDownloadPDF} disabled={PdfLoader===true?true:false} className="w-full md:w-auto inline-flex space-x-2 items-center  text-white font-md py-2 px-4  rounded focus:outline-none focus:shadow-outline " type="button" style={{fontWeight:"600",background:"#28419a",display:"flex",justifyContent:"center"}}>
       {
         PdfLoader===true?(
           <>
